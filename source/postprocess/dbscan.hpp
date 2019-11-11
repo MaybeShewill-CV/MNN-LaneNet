@@ -1,5 +1,15 @@
-// Copyright 2019 Baidu Inc. All Rights Reserved.
-// Author: Luo Yao (luoyao@baidu.com)
+//
+// Created by Nezha on 2016/12/15.
+//
+
+/**
+* REAMME *
+* @author: ZJ Jiang (Nezha)
+* @github: https://github.com/CallmeNezha/SimpleDBSCAN
+* @describe: This is a simple DBSCAN clustering method implement
+*/
+
+// Author: MaybeShewill-CV
 // File: dbscan.hpp
 // Date: 2019/11/6 下午8:26
 

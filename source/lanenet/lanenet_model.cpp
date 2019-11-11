@@ -1,5 +1,3 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "hicpp-signed-bitwise"
 /************************************************
 * Author: MaybeShewill-CV
 * File: lanenetModel.cpp
