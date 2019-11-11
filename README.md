@@ -86,5 +86,6 @@ platform
 
 The lanenet project refers to the following projects:
 
+- [Tensorflow](https://github.com/tensorflow/tensorflow)
 - [MNN](https://github.com/alibaba/MNN)
 - [SimpleDBSCAN](https://github.com/CallmeNezha/SimpleDBSCAN)
