@@ -1,6 +1,5 @@
 /************************************************
-* Copyright 2019 Baidu Inc. All Rights Reserved.
-* Author: Luo Yao (luoyao@baidu.com)
+* Author: MaybeShewill-CV
 * File: lanenetModel.h
 * Date: 2019/11/5 下午5:19
 ************************************************/
@@ -14,15 +13,14 @@
 #include <opencv2/opencv.hpp>
 
 #include <Interpreter.hpp>
-#include <Session.hpp>
 #include <Tensor.hpp>
-#include "3rd_party/config_parse_utils/config_parser.h"
-#include "dbscan.hpp"
+#include "common/config_parse_utils/config_parser.h"
+#include "postprocess/dbscan.hpp"
 
-namespace beec_task {
+namespace lanenet {
 namespace lane_detection {
 
-using beec::config_parse_utils::ConfigParser;
+using common::config_parse_utils::ConfigParser;
 using DBSCAMSample = DBSCAMSample<float>;
 using Feature = Feature<float>;
 
@@ -47,7 +45,7 @@ public:
      * 4.Init dbscan cluster min pts which are supposed to belong to a core object.
      * @param config : ConfigParser object
      */
-    LaneNet(const ConfigParser& config);
+    explicit LaneNet(const ConfigParser& config);
 
     /***
     * Not allow copy here
@@ -160,8 +158,8 @@ private:
      * @return : stddev feature vector
      */
     static Feature calculate_stddev_feature_vector(
-            const std::vector<DBSCAMSample >& input_samples,
-            const Feature& mean_feature_vec);
+        const std::vector<DBSCAMSample >& input_samples,
+        const Feature& mean_feature_vec);
 
     /***
      * simultaneously random shuffle two vector inplace. The two input source vector should have the same size.

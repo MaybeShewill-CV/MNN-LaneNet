@@ -1,6 +1,7 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "hicpp-signed-bitwise"
 /************************************************
-* Copyright 2019 Baidu Inc. All Rights Reserved.
-* Author: Luo Yao (luoyao@baidu.com)
+* Author: MaybeShewill-CV
 * File: lanenetModel.cpp
 * Date: 2019/11/5 下午5:19
 ************************************************/
@@ -13,9 +14,9 @@
 #include <boost/lexical_cast.hpp>
 
 #include <AutoTime.hpp>
-#include "dbscan.hpp"
+#include "postprocess/dbscan.hpp"
 
-namespace beec_task {
+namespace lanenet {
 namespace lane_detection {
 
 /******************Public Function Sets***************/
@@ -28,7 +29,7 @@ namespace lane_detection {
  * 4.Init dbscan cluster min pts which are supposed to belong to a core object.
  * @param config
  */
-LaneNet::LaneNet(const beec::config_parse_utils::ConfigParser &config) {
+LaneNet::LaneNet(const ConfigParser &config) {
     using config_content = std::map<std::string, std::string>;
 
     config_content config_section;
@@ -110,7 +111,6 @@ LaneNet::LaneNet(const beec::config_parse_utils::ConfigParser &config) {
     _m_input_node_size_host.height = _m_input_tensor_host->height();
 
     _m_successfully_initialized = true;
-    return;
 }
 
 /***
@@ -212,8 +212,6 @@ void LaneNet::preprocess(const cv::Mat &input_image, cv::Mat& output_image) {
 
     cv::divide(output_image, cv::Scalar(127.5, 127.5, 127.5), output_image);
     cv::subtract(output_image, cv::Scalar(1.0, 1.0, 1.0), output_image);
-
-    return;
 }
 
 /***
@@ -293,7 +291,7 @@ void LaneNet::visualize_instance_segmentation_result(
     };
 
     omp_set_num_threads(4);
-    for (int class_id = 0; class_id < cluster_ret.size(); ++class_id) {
+    for (ulong class_id = 0; class_id < cluster_ret.size(); ++class_id) {
         auto class_color = color_map[class_id];
         #pragma omp parallel for
         for (auto index = 0; index < cluster_ret[class_id].size(); ++index) {
@@ -317,16 +315,16 @@ Feature LaneNet::calculate_mean_feature_vector(const std::vector<DBSCAMSample> &
         return Feature();
     }
 
-    auto feature_dims = input_samples[0].get_feature_vector().size();
-    auto sample_nums = input_samples.size();
+    uint feature_dims = input_samples[0].get_feature_vector().size();
+    uint sample_nums = input_samples.size();
     Feature mean_feature_vec;
     mean_feature_vec.resize(feature_dims, 0.0);
     for (const auto& sample : input_samples) {
-        for (auto index = 0; index < feature_dims; ++index) {
+        for (uint index = 0; index < feature_dims; ++index) {
             mean_feature_vec[index] += sample[index];
         }
     }
-    for (auto index = 0; index < feature_dims; ++index) {
+    for (uint index = 0; index < feature_dims; ++index) {
         mean_feature_vec[index] /= sample_nums;
     }
 
@@ -340,28 +338,28 @@ Feature LaneNet::calculate_mean_feature_vector(const std::vector<DBSCAMSample> &
  * @return
  */
 Feature LaneNet::calculate_stddev_feature_vector(
-        const std::vector<DBSCAMSample> &input_samples,
-        const Feature& mean_feature_vec) {
+    const std::vector<DBSCAMSample> &input_samples,
+    const Feature& mean_feature_vec) {
 
     if (input_samples.empty()) {
         return Feature();
     }
 
-    auto feature_dims = input_samples[0].get_feature_vector().size();
-    auto sample_nums = input_samples.size();
+    uint feature_dims = input_samples[0].get_feature_vector().size();
+    uint sample_nums = input_samples.size();
 
     // calculate stddev feature vector
     Feature stddev_feature_vec;
     stddev_feature_vec.resize(feature_dims, 0.0);
     for (const auto& sample : input_samples) {
-        for (auto index = 0; index < feature_dims; ++index) {
+        for (uint index = 0; index < feature_dims; ++index) {
             auto sample_feature = sample.get_feature_vector();
             auto diff = sample_feature[index] - mean_feature_vec[index];
             diff = std::pow(diff, 2);
             stddev_feature_vec[index] += diff;
         }
     }
-    for (auto index = 0; index < feature_dims; ++index) {
+    for (uint index = 0; index < feature_dims; ++index) {
         stddev_feature_vec[index] /= sample_nums;
         stddev_feature_vec[index] = std::sqrt(stddev_feature_vec[index]);
     }
@@ -386,7 +384,7 @@ void LaneNet::normalize_sample_features(const std::vector<DBSCAMSample> &input_s
     std::vector<DBSCAMSample> input_samples_copy = input_samples;
     for (auto& sample : input_samples_copy) {
         auto feature = sample.get_feature_vector();
-        for (auto index = 0; index < feature.size(); ++index) {
+        for (ulong index = 0; index < feature.size(); ++index) {
             feature[index] = (feature[index] - mean_feature_vector[index]) / stddev_feature_vector[index];
         }
         sample.set_feature_vector(feature);
