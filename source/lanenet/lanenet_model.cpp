@@ -277,8 +277,6 @@ void LaneNet::visualize_instance_segmentation_result(
     const std::vector<cv::Point> &coords,
     cv::Mat& intance_segmentation_result) {
 
-    LOG(INFO) << "Cluster nums: " << cluster_ret.size();
-
     std::map<int, cv::Scalar> color_map = {
         {0, cv::Scalar(0, 0, 255)},
         {1, cv::Scalar(0, 255, 0)},
@@ -417,7 +415,7 @@ void LaneNet::simultaneously_random_shuffle(std::vector<T1> src1, std::vector<T2
     std::vector<T2> src2_copy(src2);
 
     // random two source input vector via random shuffled index vector
-    for (uint i = 0; i < indexes.size(); ++i) {
+    for (ulong i = 0; i < indexes.size(); ++i) {
         src1[i] = src1_copy[indexes[i]];
         src2[i] = src2_copy[indexes[i]];
     }

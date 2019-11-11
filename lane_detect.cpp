@@ -2,7 +2,7 @@
 // File: lane_detect.cpp
 // Date: 2019/11/11 上午11:08
 
-// Lane Detection 服务
+// Lane Detection Test Project
 
 #include <string>
 #include <memory>
