@@ -47,6 +47,11 @@ commands
 cd ROOT_DIR
 bash checkpoint/convert_ckpt_into_mnn_model.sh MNNConverter_TOOL_PATH
 ```
+You may get some useful information via following command
+```
+cd ROOT_DIR
+bash checkpoint/convert_ckpt_into_mnn_model.sh -h
+```
 You will get the mnn model named lanenet_model.mnn in folder ./checkpoint
 if everything works correctly
 
