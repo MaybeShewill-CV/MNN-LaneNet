@@ -16,9 +16,9 @@ import argparse
 
 import tensorflow as tf
 
-MODEL_WEIGHTS_FILE_PATH = '../checkpoint/tusimple_lanenet_vgg.ckpt'
-MODEL_META_FILE_PATH = '../checkpoint/tusimple_lanenet_vgg.ckpt.meta'
-OUTPUT_PB_FILE_PATH = '../checkpoint/tusimple_lanenet.pb'
+MODEL_WEIGHTS_FILE_PATH = './checkpoint/tusimple_lanenet_vgg.ckpt'
+MODEL_META_FILE_PATH = './checkpoint/tusimple_lanenet_vgg.ckpt.meta'
+OUTPUT_PB_FILE_PATH = './checkpoint/tusimple_lanenet.pb'
 
 
 def init_args():
@@ -27,25 +27,21 @@ def init_args():
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-w', '--weights_path', default=MODEL_WEIGHTS_FILE_PATH)
+    parser.add_argument('-w', '--model_meta_path', default=MODEL_META_FILE_PATH)
     parser.add_argument('-s', '--save_path', default=OUTPUT_PB_FILE_PATH)
 
     return parser.parse_args()
 
 
-def convert_ckpt_into_pb_file(ckpt_file_path, pb_file_path):
+def convert_ckpt_into_pb_file(model_meta_file_path, pb_file_path):
     """
 
-    :param ckpt_file_path:
+    :param model_meta_file_path:
     :param pb_file_path:
     :return:
     """
-    # construct compute graph
-    with tf.variable_scope('lanenet'):
-        input_tensor = tf.placeholder(dtype=tf.float32, shape=[1, 256, 512, 3], name='input_tensor')
-
     # create a session
-    saver = tf.train.import_meta_graph(MODEL_META_FILE_PATH)
+    saver = tf.train.import_meta_graph(model_meta_file_path)
 
     sess_config = tf.ConfigProto()
     sess_config.gpu_options.per_process_gpu_memory_fraction = 0.85
@@ -55,7 +51,7 @@ def convert_ckpt_into_pb_file(ckpt_file_path, pb_file_path):
     sess = tf.Session(config=sess_config)
 
     with sess.as_default():
-        saver.restore(sess=sess, save_path=tf.train.latest_checkpoint('../checkpoint'))
+        saver.restore(sess=sess, save_path=tf.train.latest_checkpoint('./checkpoint'))
 
         graph = sess.graph
         binary_seg_ret = graph.get_tensor_by_name("lanenet_model/vgg_backend/binary_seg/ArgMax:0")
@@ -88,6 +84,6 @@ if __name__ == '__main__':
     args = init_args()
 
     convert_ckpt_into_pb_file(
-        ckpt_file_path=args.weights_path,
+        model_meta_file_path=args.model_meta_path,
         pb_file_path=args.save_path
     )
