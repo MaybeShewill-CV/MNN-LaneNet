@@ -28,15 +28,6 @@ platform will be done recently.
 and place the ckpt file into folder ./checkpoint
 ```
 
-#### Build Binary file
-
-```
-1.cd ROOT_DIR/build
-2.cmake .. && make -j4
-```
-You will get the built executable binary file named lane_detector.out in
-folder ./build if everything works correctly
-
 #### Convert Model File
 
 First you need to compile your own MNNConverter tools in your local
@@ -54,6 +45,15 @@ bash checkpoint/convert_ckpt_into_mnn_model.sh -h
 ```
 You will get the mnn model named lanenet_model.mnn in folder ./checkpoint
 if everything works correctly
+
+#### Build Binary file
+
+```
+1.cd ROOT_DIR/build
+2.cmake .. && make -j4
+```
+You will get the built executable binary file named lane_detector.out in
+folder ./build if everything works correctly
 
 ## Test model
 
