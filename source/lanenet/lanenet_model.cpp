@@ -56,6 +56,15 @@ LaneNet::LaneNet(const ConfigParser &config) {
         _m_dbscan_min_pts = boost::lexical_cast<uint>(config_section["dbscan_core_object_min_pts"]);
     }
 
+    if (config_section.find("embedding_feats_dilution_ratio") == config_section.end()) {
+        LOG(ERROR) << "Can not find \"embedding_feats_dilution_ratio\" field in config section";
+        _m_successfully_initialized = false;
+        return;
+    } else {
+        _m_embedding_features_dilution_ratio = boost::lexical_cast<float>(
+                config_section["embedding_feats_dilution_ratio"]);
+    }
+
     if (config_section.find("pix_embedding_feature_dims") == config_section.end()) {
         LOG(ERROR) << "Can not find \"pix_embedding_feature_dims\" field in config section";
         _m_successfully_initialized = false;
@@ -172,22 +181,32 @@ void LaneNet::detect(const cv::Mat &input_image, cv::Mat &binary_seg_result, cv:
     // simultaneously random shuffle embedding vector and coord vector inplace
     simultaneously_random_shuffle<cv::Point, DBSCAMSample >(coords, pixel_embedding_samples);
 
+    // simultaneously random select embedding vector and coord vector to reduce the cluster time
+    std::vector<cv::Point> coords_selected;
+    std::vector<DBSCAMSample> pixel_embedding_samples_selected;
+    simultaneously_random_select<DBSCAMSample, cv::Point>(pixel_embedding_samples, coords,
+            _m_embedding_features_dilution_ratio,pixel_embedding_samples_selected, coords_selected);
+    coords.clear();
+    coords.shrink_to_fit();
+    pixel_embedding_samples.clear();
+    pixel_embedding_samples.shrink_to_fit();
+
     // normalize pixel embedding features
-    normalize_sample_features(pixel_embedding_samples, pixel_embedding_samples);
+    normalize_sample_features(pixel_embedding_samples_selected, pixel_embedding_samples_selected);
 
     // cluster samples
     std::vector<std::vector<uint> > cluster_ret;
     std::vector<uint> noise;
     {
         AUTOTIME
-        cluster_pixem_embedding_features(pixel_embedding_samples, cluster_ret, noise);
+        cluster_pixem_embedding_features(pixel_embedding_samples_selected, cluster_ret, noise);
     }
 
     // visualize instance segmentation
     instance_seg_result = cv::Mat(_m_input_node_size_host, CV_8UC3, cv::Scalar(0, 0, 0));
     {
         AUTOTIME
-        visualize_instance_segmentation_result(cluster_ret, coords, instance_seg_result);
+        visualize_instance_segmentation_result(cluster_ret, coords_selected, instance_seg_result);
     }
 }
 
@@ -416,6 +435,52 @@ void LaneNet::simultaneously_random_shuffle(std::vector<T1> src1, std::vector<T2
     for (ulong i = 0; i < indexes.size(); ++i) {
         src1[i] = src1_copy[indexes[i]];
         src2[i] = src2_copy[indexes[i]];
+    }
+}
+
+/***
+ * simultaneously random select part of the two input vector into the two output vector.
+ * The two input source vector should have the same size because they have one-to-one mapping
+ * relation between the elements in two input vector
+ * @tparam T1 : type of input vector src1 which should support default constructor
+ *              due to the usage of vector resize function
+ * @tparam T2 : type of input vector src2 which should support default constructor
+ *              due to the usage of vector resize function
+ * @param src1 : input vector src1
+ * @param src2 : input vector src2
+ * @param select_ratio : select ratio which should within range [0.0, 1.0]
+ * @param output1 : selected partial vector of src1
+ * @param output2 : selected partial vector of src2
+ */
+template <typename T1, typename T2>
+void LaneNet::simultaneously_random_select(
+    const std::vector<T1> &src1, const std::vector<T2> &src2, float select_ratio,
+    std::vector<T1>& output1, std::vector<T2>& output2) {
+
+    // check if select ratio is right
+    if (select_ratio < 0.0 || select_ratio > 1.0) {
+        LOG(ERROR) << "Select ratio should be in range [0.0, 1.0]";
+        return;
+    }
+
+    // calculate selected element counts using ceil to get
+    CHECK_EQ(src1.size(), src2.size());
+    auto src_element_counts = src1.size();
+    auto selected_elements_counts = static_cast<uint>(std::ceil(src_element_counts * select_ratio));
+    CHECK_LE(selected_elements_counts, src_element_counts);
+
+    // random shuffle indexes
+    std::vector<uint> indexes = std::vector<uint>(src_element_counts);
+    std::iota(indexes.begin(), indexes.end(), 0);
+    std::random_shuffle(indexes.begin(), indexes.end());
+
+    // select part of the elements via first selected_elements_counts index in random shuffled indexes vector
+    output1.resize(selected_elements_counts);
+    output2.resize(selected_elements_counts);
+
+    for (uint i = 0; i < selected_elements_counts; ++i) {
+        output1[i] = src1[indexes[i]];
+        output2[i] = src2[indexes[i]];
     }
 }
 

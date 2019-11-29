@@ -57,7 +57,7 @@ public:
     /***
      * Default constructor not supplied here
      */
-    DBSCAMSample() = delete;
+    DBSCAMSample() = default;
 
     /***
      * Default destructor
@@ -152,7 +152,6 @@ template <typename T>
 void DBSCAMSample<T>::set_class_id(uint class_id) {
     _m_class_id = class_id;
 }
-
 
 //! type T must be a vector-like container and MUST SUPPORT operator[] for iteration
 //! Float can be float ,double ,int or any other number type but MUST SUPPORT implicitly convert to double type

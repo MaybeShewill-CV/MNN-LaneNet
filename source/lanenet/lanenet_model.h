@@ -98,6 +98,8 @@ private:
     float _m_dbscan_eps = 0.0;
     // dbscan min pts threshold
     uint _m_dbscan_min_pts = 0;
+    // embedding features dilution ratio
+    float _m_embedding_features_dilution_ratio = 1.0;
     // successfully init model flag
     bool _m_successfully_initialized = false;
 
@@ -169,6 +171,24 @@ private:
      */
     template <typename T1, typename T2>
     static void simultaneously_random_shuffle(std::vector<T1> src1, std::vector<T2> src2);
+
+    /***
+     * simultaneously random select part of the two input vector into the two output vector.
+     * The two input source vector should have the same size because they have one-to-one mapping
+     * relation between the elements in two input vector
+     * @tparam T1 : type of input vector src1 which should support default constructor
+     *              due to the usage of vector resize function
+     * @tparam T2 : type of input vector src2 which should support default constructor
+     *              due to the usage of vector resize function
+     * @param src1 : input vector src1
+     * @param src2 : input vector src2
+     * @param select_ratio : select ratio which should within range [0.0, 1.0]
+     * @param output1 : selected partial vector of src1
+     * @param output2 : selected partial vector of src2
+     */
+    template <typename T1, typename T2>
+    static void simultaneously_random_select(const std::vector<T1>& src1, const std::vector<T2>& src2,
+            float select_ratio, std::vector<T1>& output1, std::vector<T2>& output2);
 };
 
 }
