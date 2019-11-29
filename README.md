@@ -24,7 +24,7 @@ platform will be done recently.
 
 ```
 1.cd ROOT_DIR && git clone https://github.com/MaybeShewill-CV/MNN-LaneNet.git
-2.Download the ckpt file path here https://www.dropbox.com/sh/tnsf0lw6psszvy4/AAA81r53jpUI3wLsRW6TiPCya?dl=0
+2.Download the ckpt file path here https://www.dropbox.com/sh/yndoipxt6nbhg5g/AAAPxZDDO2N0HP0YonetamJoa?dl=0
 and place the ckpt file into folder ./checkpoint
 ```
 
@@ -45,7 +45,7 @@ folder ./checkpoint convert_ckpt_into_mnn_model.sh. Run the following
 commands
 ```
 cd ROOT_DIR
-bash checkpoint/convert_ckpt_into_mnn_model.sh
+bash checkpoint/convert_ckpt_into_mnn_model.sh MNNConverter_TOOL_PATH
 ```
 You will get the mnn model named lanenet_model.mnn in folder ./checkpoint
 if everything works correctly
@@ -74,8 +74,8 @@ The results are as follows:
 
 ## Reference
 
-The origin lanenet model will be found [here](https://github.com/MaybeShewill-CV/lanenet-lane-detection)
-Feel free to raise issues to help the repo to be better.
+The origin lanenet repo can be found [here](https://github.com/MaybeShewill-CV/lanenet-lane-detection).
+Feel free to raise issues to help the repo become better.
 
 ## TODO
 - [ ] Test the model on TX2 platform
