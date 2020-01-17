@@ -20,6 +20,12 @@ The main network architecture is as follows:
 This project has been built and tested on Ubuntu16.04. Tests on other
 platform will be done recently.
 
+**OS**: Ubuntu 16.04 LTS
+
+**Tensorflow**: tensorflow 1.12.0
+
+**MNN**: mnn 0.2.1.0
+
 #### Common Preparation
 
 ```
