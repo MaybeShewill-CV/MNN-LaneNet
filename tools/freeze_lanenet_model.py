@@ -16,8 +16,8 @@ import argparse
 
 import tensorflow as tf
 
-MODEL_WEIGHTS_FILE_PATH = './checkpoint/tusimple_lanenet_vgg.ckpt'
-MODEL_META_FILE_PATH = './checkpoint/tusimple_lanenet_vgg.ckpt.meta'
+MODEL_WEIGHTS_FILE_PATH = './checkpoint/tusimple_lanenet.ckpt'
+MODEL_META_FILE_PATH = './checkpoint/tusimple_lanenet.ckpt.meta'
 OUTPUT_PB_FILE_PATH = './checkpoint/tusimple_lanenet.pb'
 
 
